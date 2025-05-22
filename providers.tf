@@ -7,9 +7,9 @@ terraform {
       version = "~> 5.0"
     }
   }
-# Optional: Specify the required Terraform version
-required_version = ">= 1.0.0"
-  
+  # Optional: Specify the required Terraform version
+  required_version = ">= 1.0.0"
+
   # Optionally configure remote state
   # backend "s3" {
   #   bucket         = "your-terraform-state-bucket"
@@ -21,6 +21,6 @@ required_version = ">= 1.0.0"
 }
 
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
   profile = var.aws_profile
 }
