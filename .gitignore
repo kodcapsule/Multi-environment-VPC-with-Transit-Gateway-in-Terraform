@@ -40,3 +40,5 @@ terraform.rc
 .terragrunt-cache
 
 testing/
+
+directory_structure.md

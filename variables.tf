@@ -1,11 +1,16 @@
 variable "aws_region" {
   description = "AWS region to deploy your  resources"
+  default = "us-east-1"
   type        = string
   validation {
     condition     = contains(["us-east-1"], var.aws_region)
     error_message = "The AWS region must be one of the following: us-east-1, us-west-2, eu-west-1."
   }
-  default = "us-east-1"
+  
+  validation {
+    condition     = length(var.aws_region) > 0
+    error_message = "AWS region cannot be empty."
+  }
 
 }
 
@@ -18,6 +23,10 @@ variable "aws_profile" {
   validation {
     condition     = length(var.aws_profile) > 0
     error_message = "AWS profile cannot be empty."
+  }
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_]+$", var.aws_profile))
+    error_message = "AWS profile can only contain alphanumeric characters and underscores."
   }
 }
 
@@ -39,6 +48,7 @@ variable "dev_vpc_cidr" {
         condition = can(regex("^10\\.1\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/16$", var.dev_vpc_cidr))
         error_message = "CIDR must be in 10.1.0.0/16 with valid octets (0–255), like 10.1.1.100/16"
       }
+  
 }
 
 variable "availability_zones" {

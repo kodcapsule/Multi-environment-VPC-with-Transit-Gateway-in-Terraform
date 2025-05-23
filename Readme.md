@@ -9,6 +9,41 @@ In this project we will be building  a Scalable and Secure Multi-VPC AWS Network
 
 ### Step 1: Set Up Project Structure
 The first step is to setup the overall project with all the neccessory files. 
+
+```bash
+terraform-infrastructure/
+├── main.tf                           # Main configuration using modules
+├── variables.tf  
+├── terraform.tfvars                     # Root variables
+├── outputs.tf  
+├── Readme.md
+├── .gitignore       
+├── modules/
+│   ├── vpc/
+│   │   ├── main.tf                   # VPC resources
+│   │   ├── variables.tf              # VPC module variables
+│   │   └── outputs.tf                # VPC module outputs
+│   ├── transit-gateway/
+│   │   ├── main.tf                   # Transit Gateway resources
+│   │   ├── variables.tf              # TGW module variables
+│   │   └── outputs.tf                # TGW module outputs
+│   └── security/
+│       ├── main.tf                   # Security Groups & NACLs
+│       ├── locals.tf                 # Local transformations
+│       ├── variables.tf              # Security module variables
+│       └── outputs.tf                # Security module outputs
+└── environments/                     # Optional: Environment-specific configs
+    ├── dev/
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   └── terraform.tfvars
+    └── prod/
+        ├── main.tf
+        ├── variables.tf
+        └── terraform.tfvars
+```
+
+
 ```bash
 multi-env-vpc/
 ├── main.tf         # Main configuration file
