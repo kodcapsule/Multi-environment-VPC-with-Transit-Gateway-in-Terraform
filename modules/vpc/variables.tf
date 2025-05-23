@@ -4,15 +4,15 @@ variable "vpc_cidr" {
   type        = string
   default = "10.0.0.0/16"
 
-  # validation {
-  #       condition = can(regex("^10\\.0\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/16$", var.prod_vpc_cidr))
-  #       error_message = "CIDR must be in 10.0.0.0/16 with valid octets (0–255), like 10.0.1.100/16"
-  #     }
-
   validation {
-    condition = can(regex("^((10\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d))|(172\\.(1[6-9]|2[0-9]|3[0-1])\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d))|(192\\.168\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)))\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/(1[6-9]|2[0-9]|3[0-2])$", var.dev_vpc_cidr))
-    error_message = "CIDR must be a valid private IP range (10.0.0.0/16, 172.16.0.0/16, or 192.168.0.0/16) with a subnet mask of /16 or more specific"
-  }
+        condition = can(regex("^10\\.0\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/16$", var.vpc_cidr))
+        error_message = "CIDR must be in 10.0.0.0/16 with valid octets (0–255), like 10.0.1.100/16"
+      }
+
+  # validation {
+  #   condition = can(regex("^((10\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d))|(172\\.(1[6-9]|2[0-9]|3[0-1])\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d))|(192\\.168\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)))\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/(1[6-9]|2[0-9]|3[0-2])$", var.dev_vpc_cidr))
+  #   error_message = "CIDR must be a valid private IP range (10.0.0.0/16, 172.16.0.0/16, or 192.168.0.0/16) with a subnet mask of /16 or more specific"
+  # }
 
   
 }
@@ -44,8 +44,14 @@ variable "tags" {
   type        = map(string)
   default     = {}
 
+  # Validation for tags  
   validation {
-    condition     = can(regex("^[a-zA-Z0-9_]+$", var.tags))
-    error_message = "Tags can only contain alphanumeric characters and underscores."
+    condition = alltrue([for k, v in var.tags : can(regex("^[a-zA-Z0-9_-]+$", k)) && can(regex("^[a-zA-Z0-9_\\s-]+$", v)) ])
+    error_message = "Tags can only contain alphanumeric characters, underscores, and hyphens."
+  }
+
+  validation {
+    condition     = length(var.tags) <= 10
+    error_message = "A maximum of 10 tags can be specified."
   }
 }

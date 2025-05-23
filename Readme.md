@@ -107,8 +107,37 @@ validation {
   }
 ```
 
+**2. Error: Invalid value for variable**
+
+```bash
+│ Error: Invalid value for variable
+│ 
+│   on main.tf line 482, in module "prod_vpc":
+│  482:   tags = {
+│  483:     Environment = "production"
+│  484:     Project     = var.environment
+│  485:   }
+│     ├────────────────
+│     │ var.tags is map of string with 2 elements
+```
+
+**code causing error:**
+
+```bash
+   validation {
+    condition = alltrue([for k, v in var.tags : can(regex("^[a-zA-Z0-9_-]+$", k)) && can(regex("^[a-zA-Z0-9_\\s-]+$", v)) ])
+    error_message = "Tags can only contain alphanumeric characters, underscores, and hyphens."
+  }
+```
 
 
+**Solution:**
+```bash
+ validation {
+    condition = alltrue([for k, v in var.tags : can(regex("^[a-zA-Z0-9_-]+$", k)) && can(regex("^[a-zA-Z0-9_\\s-]+$", v)) ])
+    error_message = "Tags can only contain alphanumeric characters, underscores, and hyphens."
+  }
+```
 ## Additional Considerations
 
 To enhance this project further, you could add NAT gateways for private subnets to access the internet
@@ -119,12 +148,3 @@ This project demonstrates proper network isolation between environments while al
 
 
 
-<!-- #  validation {
-#     condition     = anytrue([can(regex("10(?:\\.(?:[0-1]?[0-9]?[0-9])|(?:2[0-5]?[0-9])){3}\\/", var.prod_vpc_cidr)), can(regex("172\\.(?:3?[0-1])|(?:[0-2]?[0-9])(?:\\.[0-2]?[0-5]?[0-9]){2}\\/(?:1[6-9]|2[0-9]|3[0-2])", var.prod_vpc_cidr))])
-#     error_message = "Must be a valid IPv4 CIDR block address."
-#   }
-
-#  validation {
-#     condition = can(regex("^10\\.0\\.(\\d{1,3})\\.(\\d{1,3})/16$", var.prod_vpc_cidr))
-#     error_message = "CIDR block must be within 10.0.0.0/16 range, e.g., 10.0.0.0/16 or 10.0.100.200/16"
-#   } -->

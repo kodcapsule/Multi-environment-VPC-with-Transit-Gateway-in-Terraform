@@ -1,83 +1,41 @@
+# 
+
 variable "aws_region" {
-  description = "AWS region to deploy your  resources"
-  default = "us-east-1"
+  description = "AWS region to deploy resources"
   type        = string
-  validation {
-    condition     = contains(["us-east-1"], var.aws_region)
-    error_message = "The AWS region must be one of the following: us-east-1, us-west-2, eu-west-1."
-  }
-  
-  validation {
-    condition     = length(var.aws_region) > 0
-    error_message = "AWS region cannot be empty."
-  }
+  default     = "us-west-2"
 
 }
-
-
 
 variable "aws_profile" {
-  description = "AWS profile to use for authentication"
+  description = "AWS CLI profile to use"
   type        = string
   default     = "default"
-  validation {
-    condition     = length(var.aws_profile) > 0
-    error_message = "AWS profile cannot be empty."
-  }
-  validation {
-    condition     = can(regex("^[a-zA-Z0-9_]+$", var.aws_profile))
-    error_message = "AWS profile can only contain alphanumeric characters and underscores."
-  }
+
 }
+
+
 
 variable "prod_vpc_cidr" {
   description = "CIDR block for production VPC"
-  default = "10.0.0.0/16"
-    validation {
-        condition = can(regex("^10\\.0\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/16$", var.prod_vpc_cidr))
-        error_message = "CIDR must be in 10.0.0.0/16 with valid octets (0–255), like 10.0.1.100/16"
-      }
+  type        = string
+  default     = "10.0.0.0/16"
 }
-
-
 
 variable "dev_vpc_cidr" {
   description = "CIDR block for development VPC"
+  type        = string
   default     = "10.1.0.0/16"
-      validation {
-        condition = can(regex("^10\\.1\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/16$", var.dev_vpc_cidr))
-        error_message = "CIDR must be in 10.1.0.0/16 with valid octets (0–255), like 10.1.1.100/16"
-      }
-  
 }
 
 variable "availability_zones" {
-  description = "List of availability zones to use"
+  description = "List of availability zones"
   type        = list(string)
-
-  default = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  validation {
-    condition     = length(var.availability_zones) >= 1
-    error_message = "At least one availability zone must be specified."
-  }
+  default     = ["us-west-2a", "us-west-2b"]
 }
 
-
 variable "environment" {
-  description = "Environment for resource tagging"
-  default     = "dev"
+  description = "Environment/Project name"
   type        = string
-  # define tags for environment
-
-  validation {
-    condition     = length(var.environment) > 2
-    error_message = "Environment name cannot be  empty or less than 2 characters."
-  }
-
-  validation {
-    condition     = contains(["dev", "prod", "staging"], var.environment)
-    error_message = "Environment must be either 'dev' , 'prod'or 'staging'."
-  }
-
-
+  default     = "multi-env"
 }

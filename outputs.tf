@@ -1,34 +1,34 @@
-output "production_vpc_id" {
-  description = "ID of the Production VPC"
-  value       = aws_vpc.prod.id
+# 
+
+# =============================================================
+
+# outputs.tf
+output "prod_vpc_id" {
+  description = "Production VPC ID"
+  value       = module.prod_vpc.vpc_id
 }
 
-output "development_vpc_id" {
-  description = "ID of the Development VPC"
-  value       = aws_vpc.dev.id
+output "dev_vpc_id" {
+  description = "Development VPC ID"
+  value       = module.dev_vpc.vpc_id
 }
 
 output "transit_gateway_id" {
-  description = "ID of the Transit Gateway"
-  value       = aws_ec2_transit_gateway.tgw.id
+  description = "Transit Gateway ID"
+  value       = module.transit_gateway.transit_gateway_id
+}
+
+output "security_group_ids" {
+  description = "Security Group IDs"
+  value       = module.security.security_group_ids
 }
 
 output "prod_private_subnet_ids" {
-  description = "IDs of the Production private subnets"
-  value       = aws_subnet.prod_private[*].id
+  description = "Production private subnet IDs"
+  value       = module.prod_vpc.private_subnet_ids
 }
 
 output "dev_private_subnet_ids" {
-  description = "IDs of the Development private subnets"
-  value       = aws_subnet.dev_private[*].id
-}
-
-output "prod_app_security_group_id" {
-  description = "ID of the Production application security group"
-  value       = aws_security_group.prod_app.id
-}
-
-output "dev_app_security_group_id" {
-  description = "ID of the Development application security group"
-  value       = aws_security_group.dev_app.id
+  description = "Development private subnet IDs"
+  value       = module.dev_vpc.private_subnet_ids
 }

@@ -1,5 +1,4 @@
 
-# modules/transit-gateway/variables.tf
 variable "name" {
   description = "Name of the Transit Gateway"
   type        = string
@@ -87,3 +86,15 @@ variable "tags" {
   default     = {}
 }
 
+
+variable "amazon_side_asn" {
+  description = "The ASN for the Amazon side of a BGP session"
+  type        = string
+  default     = "64512"
+
+  validation {
+    condition     = can(regex("^(65[0-3][0-5][0-1]|64[0-9]{2}|6[0-3][0-9]{3}|[1-5][0-9]{4}|[1-9][0-9]{0,4})$", var.amazon_side_asn))
+    error_message = "amazon_side_asn must be a valid ASN."
+  }
+  
+}
