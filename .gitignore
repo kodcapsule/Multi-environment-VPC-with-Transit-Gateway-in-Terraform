@@ -42,3 +42,5 @@ terraform.rc
 testing/
 
 directory_structure.md
+
+*.tftest.hcl

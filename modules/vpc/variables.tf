@@ -5,12 +5,6 @@ variable "vpc_cidr" {
   default = "10.0.0.0/16"
 
 
-  # check if the provided CIDR block is a valid format
-
-#   validation {
-#   condition = can(regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$", var.vpc_cidr))
-#   error_message = "Must be a valid IPv4 address format (e.g., 192.168.1.1). Each octet must be between 0-255."
-# }
   
 
   validation {
