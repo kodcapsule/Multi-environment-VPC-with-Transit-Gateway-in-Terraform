@@ -28,6 +28,8 @@ module "dev_vpc" {
   }
 }
 
+
+
 # Create Transit Gateway with attachments
 module "transit_gateway" {
   source = "./modules/transit-gateway"
@@ -44,7 +46,7 @@ module "transit_gateway" {
     dev = {
       vpc_id      = module.dev_vpc.vpc_id
       subnet_ids  = module.dev_vpc.private_subnet_ids
-      environment = "development"
+      environment = "dev"
     }
   }
 
