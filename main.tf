@@ -163,7 +163,7 @@ module "security" {
       subnet_ids = module.prod_vpc.private_subnet_ids
       ingress_rules = {
         internal = {
-          rule_number = 100
+          rule_number = 110
           protocol    = "-1"
           action      = "allow"
           cidr_block  = var.prod_vpc_cidr
@@ -171,7 +171,7 @@ module "security" {
           to_port     = 0
         }
         from_dev = {
-          rule_number = 110
+          rule_number = 120
           protocol    = "-1"
           action      = "allow"
           cidr_block  = var.dev_vpc_cidr
@@ -179,7 +179,7 @@ module "security" {
           to_port     = 0
         }
         return_traffic = {
-          rule_number = 120
+          rule_number = 130
           protocol    = "tcp"
           action      = "allow"
           cidr_block  = "0.0.0.0/0"
@@ -189,7 +189,7 @@ module "security" {
       }
       egress_rules = {
         all = {
-          rule_number = 100
+          rule_number = 140
           protocol    = "-1"
           action      = "allow"
           cidr_block  = "0.0.0.0/0"
@@ -207,7 +207,7 @@ module "security" {
       subnet_ids = module.dev_vpc.private_subnet_ids
       ingress_rules = {
         internal = {
-          rule_number = 100
+          rule_number = 110
           protocol    = "-1"
           action      = "allow"
           cidr_block  = var.dev_vpc_cidr
@@ -215,7 +215,7 @@ module "security" {
           to_port     = 0
         }
         ssh_from_prod = {
-          rule_number = 110
+          rule_number = 120
           protocol    = "tcp"
           action      = "allow"
           cidr_block  = var.prod_vpc_cidr
@@ -223,7 +223,7 @@ module "security" {
           to_port     = 22
         }
         http_from_prod = {
-          rule_number = 120
+          rule_number = 130
           protocol    = "tcp"
           action      = "allow"
           cidr_block  = var.prod_vpc_cidr
@@ -231,7 +231,7 @@ module "security" {
           to_port     = 80
         }
         https_from_prod = {
-          rule_number = 130
+          rule_number = 140
           protocol    = "tcp"
           action      = "allow"
           cidr_block  = var.prod_vpc_cidr
@@ -239,7 +239,7 @@ module "security" {
           to_port     = 443
         }
         return_traffic = {
-          rule_number = 140
+          rule_number = 150
           protocol    = "tcp"
           action      = "allow"
           cidr_block  = "0.0.0.0/0"

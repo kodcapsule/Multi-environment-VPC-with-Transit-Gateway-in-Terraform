@@ -134,7 +134,7 @@ locals {
         for rule_key, rule in nacl.egress_rules : {
           key         = "${nacl_key}-egress-${rule_key}"
           nacl_key    = nacl_key
-          rule_number = rule.rule_number
+          rule_number = rule.rule_number 
           protocol    = rule.protocol
           action      = rule.action
           cidr_block  = rule.cidr_block

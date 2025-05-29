@@ -3,14 +3,14 @@
 variable "aws_region" {
   description = "AWS region to deploy resources"
   type        = string
-  default     = "us-west-2"
+  default     = "us-east-1"
 
 }
 
 variable "aws_profile" {
   description = "AWS CLI profile to use"
   type        = string
-  default     = "default"
+  default     = "wewoli"
 
 }
 
@@ -31,7 +31,7 @@ variable "dev_vpc_cidr" {
 variable "availability_zones" {
   description = "List of availability zones"
   type        = list(string)
-  default     = ["us-west-2a", "us-west-2b"]
+  default     = ["us-east-1a", "us-east-1b"]
 }
 
 variable "environment" {

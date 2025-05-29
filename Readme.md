@@ -32,29 +32,9 @@ terraform-infrastructure/
 │       ├── locals.tf                 # Local transformations
 │       ├── variables.tf              # Security module variables
 │       └── outputs.tf                # Security module outputs
-└── environments/                     # Optional: Environment-specific configs
-    ├── dev/
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   └── terraform.tfvars
-    └── prod/
-        ├── main.tf
-        ├── variables.tf
-        └── terraform.tfvars
+└── images/                          # contains diagrams and other related images 
+   
 ```
-
-
-```bash
-multi-env-vpc/
-├── main.tf         # Main configuration file
-├── variables.tf    # Input variables
-├── outputs.tf      # Output values
-├── providers.tf    # Contains all the Provider configuration
-├── .gitignore      # 
-└── README.md       # Project documentation
-```
-
-
 
 ### Step 2: Configure Providers and Variables
 
@@ -138,6 +118,17 @@ validation {
     error_message = "Tags can only contain alphanumeric characters, underscores, and hyphens."
   }
 ```
+
+**3. Error: api error NetworkAclEntryAlreadyExists**
+```bash
+│ Error: api error NetworkAclEntryAlreadyExists: EC2 Network ACL (acl-07ff779bf652f56c6) Rule (egress: false)(110) already exists
+│
+│   with module.security.aws_network_acl_rule.ingress["dev_private-ingress-internal"],
+│   on modules\security\main.tf line 52, in resource "aws_network_acl_rule" "ingress":
+│   52: resource "aws_network_acl_rule" "ingress" {
+
+```
+
 ## Additional Considerations
 
 To enhance this project further, you could add NAT gateways for private subnets to access the internet
