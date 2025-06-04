@@ -29,6 +29,33 @@ module "dev_vpc" {
 }
 
 
+module "staging_vpc" {
+  source = "./modules/vpc"
+
+  vpc_cidr           = var.staging_vpc_cidr
+  environment        = "staging"
+  availability_zones = var.availability_zones
+
+  tags = {
+    Environment = "staging"
+    Project     = var.environment
+  }
+
+}
+
+module "management_vpc" {
+  source = "./modules/vpc"
+
+  vpc_cidr           = var.mgnt_vpc_cidr
+  environment        = "management"
+  availability_zones = var.availability_zones
+
+  tags = {
+    Environment = "management"
+    Project     = var.environment
+  }
+
+}
 
 # Create Transit Gateway with attachments
 module "transit_gateway" {

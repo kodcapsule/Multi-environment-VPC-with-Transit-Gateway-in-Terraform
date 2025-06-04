@@ -23,6 +23,8 @@ variable "security_groups" {
     tags = map(string)
   }))
   default = {}
+
+  
   
 }
 
