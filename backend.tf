@@ -1,10 +1,13 @@
-# # backend.tf
-# terraform {
-#   backend "s3" {
-#     bucket         = "your-terraform-state-bucket"
-#     key            = "cicd-pipeline/terraform.tfstate"
-#     region         = "us-west-2"
-#     dynamodb_table = "terraform-locks"
-#     encrypt        = true
-#   }
-# }
+# backend.tf
+terraform {
+  backend "s3" {
+    bucket         = ""
+    key            = ""
+    region         = ""
+    profile        = ""
+    dynamodb_table = "multi-env-terraform-state-lock"
+    encrypt        = true
+  }
+
+
+}

@@ -2,7 +2,7 @@
 
 
 ## Introduction
-In this project we will be building  a Scalable and Secure Multi-VPC AWS Network Infrastructure using AWS Transit Gateway. 
+In this project we will be building  a Scalable and Secure Multi environment VPC in AWS Network Infrastructure using AWS Transit Gateway. 
 ### Project Overvirew
 
 ## Building a hub-and-spoke network in AWS 
@@ -128,7 +128,66 @@ validation {
 │   52: resource "aws_network_acl_rule" "ingress" {
 
 ```
+**4. Error: Error: Error loading state:**
+```bash
+│ Error: Error loading state:
+│     Unable to access object "multi-env/terraform.tfstate" in S3 bucket "multi-env-hub-spoke-terraform-state": operation error S3: HeadObject, https response error StatusCode: 403, RequestID: 8BDXRAT0PPCQ4EZQ, HostID: 7jML04CBlhOC91fqrDc4W0sZUqrO2nWE8RnJ7COrDwGh9XMo8yI+EXLphvXuJG4bYR5p18kjv7FKa99xLkW/DWIYhI1VAIs022v2AUpbxsg=, api error Forbidden: Forbidden
+│
+│ Terraform failed to load the default state from the "s3" backend.
+│ State migration cannot occur unless the state can be loaded. Backend
+│ modification and state migration has been aborted. The state in both the
+│ source and the destination remain unmodified. Please resolve the
+│ above error and try again.
+```
 
+**Solution:**
+The authentication for the S3 backend is handled separately from the authentication of the provider. The S3 backend uses the default profile for authentication  if you do not provide any profile. If you have two different AWS profiles configured in `~/.aws/credentials`, the S3 backend will use the default profile. You will get this error if the default credentials does not have the  permissions to access your s3 bucket. You can specify the profile in the backend config like seen bellow.
+
+```bash
+terraform {
+  backend "s3" {
+    bucket         = "multi-env-hub-spoke-terraform-state"
+    key            = "multi-env-terraform.tfstate"
+    region         = "us-east-1"
+    profile        = "wewoli"
+    dynamodb_table = "multi-env-terraform-state-lock"
+    encrypt        = true
+  }
+
+}
+```
+
+you can also use partial configuration as shown bellow.  To specify a file, use the -backend-config=PATH option when running terraform init. 
+
+```bash
+terraform init -backend-config="./state.config"
+```
+
+**partial configuration**
+```bash
+# state.tf
+terraform {
+  backend "s3" {
+    bucket = "" 
+    key    = ""
+    region = ""
+    profile = ""
+  }
+}
+```
+
+```bash
+# state.config
+bucket = "your-bucket" 
+key    = "your-state.tfstate"
+region = "eu-central-1"
+profile= "Your_Profile"
+
+```
+
+```bash
+Error: validating provider credentials: retrieving caller identity from STS: operation error STS: GetCallerIdentity, https response error StatusCode: 0, RequestID: , request send failed, Post "https://sts.us-east-1.amazonaws.com/": dial tcp: lookup sts.us-east-1.amazonaws.com: no such host
+```
 ## Additional Considerations
 
 To enhance this project further, you could add NAT gateways for private subnets to access the internet
