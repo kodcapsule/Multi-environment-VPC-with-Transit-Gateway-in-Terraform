@@ -2,8 +2,28 @@
 
 
 ## Introduction
-In this project we will be building  a Scalable and Secure Multi environment VPC in AWS Network Infrastructure using AWS Transit Gateway. 
-### Project Overvirew
+In this project, we will be building a scalable and secure multi-environment VPC in AWS using AWS Transit Gateway. This project  demonstrates how you can connect multiple VPCs together and how you can control the traffic flow between the VPCs using a centralized hub-and-spoke architecture pattern. 
+
+### Project Overview
+This networking project shows how to implement a modern, enterprise-grade network architecture that will address the usual complexity of managing multiple VPCs across different environments using VPC peering. Using  AWS Transit Gateway as the central hub ,in this hub-spoke network architecture, you create a network topology that simplifies connectivity between VPCs, improves security, and provides a scalable network which can you can connect to VPN and on prem infrastructure.
+The project was implemented using Terraform, the widely used and most popular IaC tool. Using IaC and security best practices ensures reproducible, version-controlled, consistent deployment across multiple AWS regions and environments, and maintainable network infrastructure.
+
+### Project Architecture
+![Project Architecture](./images/terraf.gif)
+
+### Project Architecture Components
+This project was implemented with the below component:
+
+1. Multi-Environment VPC Design: Isoalated  VPCs for production, staging, development, and management.
+2. Centralized Transit Gateway Hub: A single point of connectivity and routing control
+3. Segmented Route Tables: Isolated routing domains for different environment types
+4. Security Group Integration: Granular security controls at the instance and application level
+5. Terraform Infrastructure: Complete IaC implementation for reproducible deployments
+7. Monitoring and Logging: Comprehensive observability through CloudWatch and VPC Flow Logs
+
+
+
+### Prerequisites
 
 ## Building a hub-and-spoke network in AWS 
 
