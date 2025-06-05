@@ -56,24 +56,186 @@ terraform-infrastructure/
    
 ```
 
-### Step 2: Configure Providers and Variables
+### Step 2: Configure Provider, Backend and Variables
+IN this second step we will configure the provider , backend and variables.
 
-Step 3: Create the Main Terraform Configuration
+**Writing the Configuration for the provider**
+In the provider configuration , we are using the AWS provider with  terraform verssion not less than 1.0.0
+The region and profile are defined as variables.
+```bash  
 
-Step 4: Set Up Transit Gateway Attachments
-Step 5: Configure Route Tables
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }  
+  required_version = ">= 1.0.0"
 
-Step 6: Implement Network ACLs with Least-Privilege Access
+}
 
-Step 7: Create Security Groups with Least-Privilege Access
+provider "aws" {
+  region  = var.aws_region
+  profile = var.aws_profile
+}
+```
 
-Step 8: Define Outputs
+**Writing the Configuration for variables**
+The variables configuration contains all the  necessory varaibles definitions  and validations to make sure your code does not break. 
+```bash
+# 
 
-Step 9: Deploy the Infrastructure
+variable "aws_region" {
+  description = "AWS region to deploy resources"
+  type        = string
+  default     = "us-east-1"
 
-Step 10: Verify Your Deployment
+validation {
+    condition     = can(regex("^(us|eu|ap|sa|ca)-[a-z]+-[1-9][0-9]$", var.aws_region))
+    error_message = "Invalid AWS region format. Use 'us-east-1', 'eu-west-1', etc."
+  }
+  
 
-Cleanup Instructions
+  validation {
+    condition     = length(var.aws_region) > 0
+    error_message = "AWS region cannot be empty."
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]+$", var.aws_region))
+    error_message = "AWS region must consist of lowercase letters, numbers, and hyphens only."
+  }
+}
+
+
+
+variable "aws_profile" {
+  description = "AWS CLI profile to use"
+  type        = string
+  default     = "wewoli"
+
+validation {
+    condition     = length(var.aws_profile) > 0
+    error_message = "AWS profile cannot be empty."
+  }
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_]+$", var.aws_profile))
+    error_message = "AWS profile must consist of alphanumeric characters and underscores only."
+  }
+
+}
+
+
+
+variable "prod_vpc_cidr" {
+  description = "CIDR block for production VPC"
+  type        = string
+  default     = "10.0.0.0/18"
+
+
+}
+
+variable "dev_vpc_cidr" {
+  description = "CIDR block for development VPC"
+  type        = string
+  default     = "10.0.64.0/18"
+}
+
+variable "staging_vpc_cidr" {
+  description = "CIDR block for staging VPC"
+  type        = string
+  default     = "10.0.128.0/18"
+
+}
+
+variable "mgnt_vpc_cidr" {
+  description = "CIDR block for management VPC"
+  type        = string
+  default     = "10.0.192.0/18"
+
+}
+
+
+
+
+
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = list(string)
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d"]
+  validation {
+    condition     = length(var.availability_zones) > 0
+    error_message = "At least one availability zone must be specified."
+  }
+}
+
+variable "environment" {
+  description = "Environment/Project name"
+  type        = string
+  default     = "multi-env"
+
+  validation {
+    condition     = length(var.environment) > 0
+    error_message = "Environment name cannot be empty."
+  }
+}
+```
+
+**Writing the Configuration for backend**
+The backend is configured to use remote backend using Amazon S3 to store the state and  DynamoDb for state locking. The backend configurations properties are difined using partial configurations in  `state.config` file. These details are passed during the init phase  using the command `terraform init -backend-config="./state.config"`
+```bash
+# backend.tf
+terraform {
+  backend "s3" {
+    bucket         = ""
+    key            = ""
+    region         = ""
+    profile        = ""
+    dynamodb_table = ""
+    encrypt        = true
+  }
+
+}
+```
+
+```bash
+# state.config
+region = "us-east-1"
+profile= "wewoli"
+bucket = "multi-env-hub-spoke-terraform-state" 
+key    = "multi-env-terraform.tfstate"
+dynamodb_table = "multi-env-terraform-state-lock"
+  
+```
+### Step 3: Create modules 
+Some components in this project are build as modules to ensure code reusability. There are  three modules in all
+1. VPC : A resuable module that has all the necessory configuration to create a VPC.
+2. Security: Contains configurations for creating security groups and network ACLs
+3. Transit Gateway: Configurations for  creating a Transit Gateway.
+
+All these modules have , varibles , outputs and main terraform definition files. There is also test file in each module that is used for unit testing and integration testing using Terraform Test framework
+
+### Step 4: Create the Main Terraform Configuration
+
+#### Step 1: Define Your VPCs using the VPC module
+
+#### Step 1: Create Transit Gateway with attachments
+
+#### Step 2: Configure Route Tables
+
+#### Step 3: Implement Network ACLs with Least-Privilege Access
+
+#### Step 7: Create Security Groups with Least-Privilege Access
+
+### Step 8: Define Outputs
+
+### Step 9: Deploy the Infrastructure
+
+### Step 10: Verify Your Deployment
+
+### Cleanup Instructions
 
 ## ERRORS and Troubleshooting
 
@@ -131,7 +293,7 @@ validation {
 ```
 
 
-**Solution:**
+**Solution**
 ```bash
  validation {
     condition = alltrue([for k, v in var.tags : can(regex("^[a-zA-Z0-9_-]+$", k)) && can(regex("^[a-zA-Z0-9_\\s-]+$", v)) ])
@@ -205,16 +367,22 @@ profile= "Your_Profile"
 
 ```
 
+**4.Error: validating provider credentials:**
 ```bash
 Error: validating provider credentials: retrieving caller identity from STS: operation error STS: GetCallerIdentity, https response error StatusCode: 0, RequestID: , request send failed, Post "https://sts.us-east-1.amazonaws.com/": dial tcp: lookup sts.us-east-1.amazonaws.com: no such host
 ```
-## Additional Considerations
 
-To enhance this project further, you could add NAT gateways for private subnets to access the internet
-Consider implementing VPC flow logs for network monitoring
-For a production setup, you might want to use separate AWS accounts for each environment, connected via Resource Access Manager (RAM)
+**Solution**
+This is caused by network failure. Make sure you  internet connection is good.
 
-This project demonstrates proper network isolation between environments while allowing controlled communication through a central Transit Gateway, all using Terraform's infrastructure as code approach.
+## Future Additions and Considerations
+
+To enhance this project in the furure, i will be adding these features.
+1. NAT gateways for private subnets to access the internet
+2. Implement  VPC flow logs for network monitoring
+3. Separate AWS accounts for each environment, connected via Resource Access Manager (RAM)
+4. Automate this using CI/CD pipeline
+
 
 
 

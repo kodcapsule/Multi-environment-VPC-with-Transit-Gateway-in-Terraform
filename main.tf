@@ -71,107 +71,108 @@ resource "aws_dynamodb_table" "remote_state_lock_table" {
 # ========================================================================
 
 # Create Production VPC
-# module "prod_vpc" {
-#   source = "./modules/vpc"
+module "prod_vpc" {
+  source = "./modules/vpc"
 
-#   vpc_cidr           = var.prod_vpc_cidr
-#   environment        = "production"
-#   availability_zones = var.availability_zones
+  vpc_cidr           = var.prod_vpc_cidr
+  environment        = "production"
+  availability_zones = var.availability_zones
 
-#   tags = {
-#     Environment = "production"
-#     Project     = var.environment
-#   }
-# }
+  tags = {
+    Environment = "production"
+    Project     = var.environment
+  }
+}
 
-# # Create Development VPC
-# module "dev_vpc" {
-#   source = "./modules/vpc"
+#  Create Development VPC
+module "dev_vpc" {
+  source = "./modules/vpc"
 
-#   vpc_cidr           = var.dev_vpc_cidr
-#   environment        = "development"
-#   availability_zones = var.availability_zones
+  vpc_cidr           = var.dev_vpc_cidr
+  environment        = "development"
+  availability_zones = var.availability_zones
 
-#   tags = {
-#     Environment = "development"
-#     Project     = var.environment
-#   }
-# }
+  tags = {
+    Environment = "development"
+    Project     = var.environment
+  }
+}
 
+#  Create Staging  VPC
+module "staging_vpc" {
+  source = "./modules/vpc"
 
-# module "staging_vpc" {
-#   source = "./modules/vpc"
+  vpc_cidr           = var.staging_vpc_cidr
+  environment        = "staging"
+  availability_zones = var.availability_zones
 
-#   vpc_cidr           = var.staging_vpc_cidr
-#   environment        = "staging"
-#   availability_zones = var.availability_zones
+  tags = {
+    Environment = "staging"
+    Project     = var.environment
+  }
 
-#   tags = {
-#     Environment = "staging"
-#     Project     = var.environment
-#   }
+}
 
-# }
+#  Create Management  VPC
+module "management_vpc" {
+  source = "./modules/vpc"
 
-# module "management_vpc" {
-#   source = "./modules/vpc"
+  vpc_cidr           = var.mgnt_vpc_cidr
+  environment        = "management"
+  availability_zones = var.availability_zones
 
-#   vpc_cidr           = var.mgnt_vpc_cidr
-#   environment        = "management"
-#   availability_zones = var.availability_zones
+  tags = {
+    Environment = "management"
+    Project     = var.environment
+  }
 
-#   tags = {
-#     Environment = "management"
-#     Project     = var.environment
-#   }
-
-# }
+}
 
 # # Create Transit Gateway with attachments
-# module "transit_gateway" {
-#   source = "./modules/transit-gateway"
+module "transit_gateway" {
+  source = "./modules/transit-gateway"
 
-#   name        = "multi-env-tgw"
-#   description = "Transit Gateway for multi-environment architecture"
+  name        = "multi-env-tgw"
+  description = "Transit Gateway for multi-environment architecture"
 
-#   vpc_attachments = {
-#     prod = {
-#       vpc_id      = module.prod_vpc.vpc_id
-#       subnet_ids  = module.prod_vpc.private_subnet_ids
-#       environment = "production"
-#     }
-#     dev = {
-#       vpc_id      = module.dev_vpc.vpc_id
-#       subnet_ids  = module.dev_vpc.private_subnet_ids
-#       environment = "dev"
-#     }
-#   }
+  vpc_attachments = {
+    prod = {
+      vpc_id      = module.prod_vpc.vpc_id
+      subnet_ids  = module.prod_vpc.private_subnet_ids
+      environment = "production"
+    }
+    dev = {
+      vpc_id      = module.dev_vpc.vpc_id
+      subnet_ids  = module.dev_vpc.private_subnet_ids
+      environment = "dev"
+    }
+  }
 
-#   vpc_routes = {
-#     # Production routes to Dev
-#     prod_to_dev_public = {
-#       route_table_id         = module.prod_vpc.public_route_table_id
-#       destination_cidr_block = var.dev_vpc_cidr
-#     }
-#     prod_to_dev_private = {
-#       route_table_id         = module.prod_vpc.private_route_table_id
-#       destination_cidr_block = var.dev_vpc_cidr
-#     }
-#     # Development routes to Prod
-#     dev_to_prod_public = {
-#       route_table_id         = module.dev_vpc.public_route_table_id
-#       destination_cidr_block = var.prod_vpc_cidr
-#     }
-#     dev_to_prod_private = {
-#       route_table_id         = module.dev_vpc.private_route_table_id
-#       destination_cidr_block = var.prod_vpc_cidr
-#     }
-#   }
+  vpc_routes = {
+    # Production routes to Dev
+    prod_to_dev_public = {
+      route_table_id         = module.prod_vpc.public_route_table_id
+      destination_cidr_block = var.dev_vpc_cidr
+    }
+    prod_to_dev_private = {
+      route_table_id         = module.prod_vpc.private_route_table_id
+      destination_cidr_block = var.dev_vpc_cidr
+    }
+    # Development routes to Prod
+    dev_to_prod_public = {
+      route_table_id         = module.dev_vpc.public_route_table_id
+      destination_cidr_block = var.prod_vpc_cidr
+    }
+    dev_to_prod_private = {
+      route_table_id         = module.dev_vpc.private_route_table_id
+      destination_cidr_block = var.prod_vpc_cidr
+    }
+  }
 
-#   tags = {
-#     Project = var.environment
-#   }
-# }
+  tags = {
+    Project = var.environment
+  }
+}
 
 # # Security configurations
 # module "security" {
