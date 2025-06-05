@@ -4,14 +4,24 @@
 ## Introduction
 In this project, we will be building a scalable and secure multi-environment VPC in AWS using AWS Transit Gateway. This project  demonstrates how you can connect multiple VPCs together and how you can control the traffic flow between the VPCs using a centralized hub-and-spoke architecture pattern. 
 
-### Project Overview
+## Project Overview
 This networking project shows how to implement a modern, enterprise-grade network architecture that will address the usual complexity of managing multiple VPCs across different environments using VPC peering. Using  AWS Transit Gateway as the central hub ,in this hub-spoke network architecture, you create a network topology that simplifies connectivity between VPCs, improves security, and provides a scalable network which can you can connect to VPN and on prem infrastructure.
 The project was implemented using Terraform, the widely used and most popular IaC tool. Using IaC and security best practices ensures reproducible, version-controlled, consistent deployment across multiple AWS regions and environments, and maintainable network infrastructure.
 
-### Project Architecture
+
+## Prerequisites
+This project is not  for beginners, so before you start, ensure you have the necessary knowledge, skills, and tools. Start by making sure you have the knowledge, skills and following tools listed below to be able to complete this project.
+
+1. An AWS account
+2. Terraform is installed and configured to work with the AWS provider
+3. Knowledge of AWS networking services like VPC, Subnets, Route Tables, AWS Transit Gateway, Network ACLs and Security groups.
+4. Some hands-on skills of working with Terraform and AWS.
+
+
+## Project Architecture and Components
 ![Project Architecture](./images/terraf.gif)
 
-### Project Architecture Components
+
 This project was implemented with the below component:
 
 1. Multi-Environment VPC Design: Isoalated  VPCs for production, staging, development, and management.
@@ -20,10 +30,6 @@ This project was implemented with the below component:
 4. Security Group Integration: Granular security controls at the instance and application level
 5. Terraform Infrastructure: Complete IaC implementation for reproducible deployments
 7. Monitoring and Logging: Comprehensive observability through CloudWatch and VPC Flow Logs
-
-
-
-### Prerequisites
 
 ## Building a hub-and-spoke network in AWS 
 
@@ -37,6 +43,7 @@ terraform-infrastructure/
 ├── terraform.tfvars                     # Root variables
 ├── outputs.tf  
 ├── Readme.md
+├── state.config
 ├── .gitignore       
 ├── modules/
 │   ├── vpc/
@@ -219,23 +226,149 @@ All these modules have , varibles , outputs and main terraform definition files.
 
 ### Step 4: Create the Main Terraform Configuration
 
-#### Step 1: Define Your VPCs using the VPC module
+**Step 1: Define Your VPCs using the VPC module**
+In this section, we define the VPCs with their configurations, including CIDR blocks and subnets. Each VPC will be configured with the appropriate network segments to support your infrastructure requirements.
+1. Production VPC
+```bash
+module "prod_vpc" {
+  source = "./modules/vpc"
 
-#### Step 1: Create Transit Gateway with attachments
+  vpc_cidr           = var.prod_vpc_cidr
+  environment        = "production"
+  availability_zones = var.availability_zones
 
-#### Step 2: Configure Route Tables
+  tags = {
+    Environment = "production"
+    Project     = var.environment
+  }
+}
+```
+2. Development VPC
+```bash
+module "dev_vpc" {
+  source = "./modules/vpc"
 
-#### Step 3: Implement Network ACLs with Least-Privilege Access
+  vpc_cidr           = var.dev_vpc_cidr
+  environment        = "development"
+  availability_zones = var.availability_zones
 
-#### Step 7: Create Security Groups with Least-Privilege Access
+  tags = {
+    Environment = "development"
+    Project     = var.environment
+  }
+}
+```
+3. Staging  VPC
+```bash
+module "staging_vpc" {
+  source = "./modules/vpc"
 
-### Step 8: Define Outputs
+  vpc_cidr           = var.staging_vpc_cidr
+  environment        = "staging"
+  availability_zones = var.availability_zones
 
-### Step 9: Deploy the Infrastructure
+  tags = {
+    Environment = "staging"
+    Project     = var.environment
+  }
 
-### Step 10: Verify Your Deployment
+}
+```
+4. Management  VPC 
+```bash
+module "management_vpc" {
+  source = "./modules/vpc"
 
-### Cleanup Instructions
+  vpc_cidr           = var.mgnt_vpc_cidr
+  environment        = "management"
+  availability_zones = var.availability_zones
+
+  tags = {
+    Environment = "management"
+    Project     = var.environment
+  }
+
+}
+```
+
+**Step 2: Create AWS Transit Gateway with attachments**
+Create the AWS Transit Gateway along with all its attachments to connect all the VPCs. The Transit Gateway serves as a central hub that enables communication between the multiple VPCs in a scalable manner. Detailed configuration specifications can be found in the main.tf file.
+
+**Step 3: Configure Route Table**
+In this  step,configure the route tables for the AWS Transit Gateway to ensure that  traffic flows between all VPCs, Dev-VPC,Prod-VPC,Mgnt_VPC and Stag-VPC. You can configure the traffic flow based on your  network requirements, but in this project, we will  configure the traffic  to flow between all connected VPCs for full inter-VPC communications. 
+
+**Step 4: Define Network ACLs and Security Groups  with Least-Privilege Access**
+Using the security module, create Network ACLs and Security Groups to control access to resources at both the subnet level and instance level. These security controls implement the principle of least privilege, ensuring that only necessary traffic is permitted while maintaining robust network security.
+
+
+
+### Step 5: Define Outputs
+```bash
+  # 
+
+# =============================================================
+
+# # outputs.tf
+output "terraform_state_bucket_name" {
+  description = "S3 bucket name for Terraform state"
+  value       = aws_s3_bucket.remote_state_bucket.bucket
+
+}
+
+output "terraform_state_lock_table_name" {
+  description = "DynamoDB table name for Terraform state lock"
+  value       = aws_dynamodb_table.remote_state_lock_table.name
+}
+
+output "prod_vpc_id" {
+  description = "Production VPC ID"
+  value       = module.prod_vpc.vpc_id
+}
+
+output "dev_vpc_id" {
+  description = "Development VPC ID"
+  value       = module.dev_vpc.vpc_id
+}
+
+output "staging_vpc_id" {
+  description = "Staging VPC ID"
+  value       = module.staging_vpc.vpc_id
+  
+}
+output "mgnt_vpc_id" {
+  description = "Management VPC ID"
+  value       = module.mgnt_vpc.vpc_id
+}
+
+output "transit_gateway_id" {
+  description = "Transit Gateway ID"
+  value       = module.transit_gateway.transit_gateway_id
+}
+
+output "security_group_ids" {
+  description = "Security Group IDs"
+  value       = module.security.security_group_ids
+}
+
+output "prod_private_subnet_ids" {
+  description = "Production private subnet IDs"
+  value       = module.prod_vpc.private_subnet_ids
+}
+
+output "dev_private_subnet_ids" {
+  description = "Development private subnet IDs"
+  value       = module.dev_vpc.private_subnet_ids
+}
+```
+
+### Step 6: Deploy the Infrastructure and Verify Your Deployment
+In this step we will deploy our infrasture to AWS and verify that all the resources are created. 
+1. First run the terraform command `terraform init`
+2. Then followed by `terraform fmt`
+3. To verify that are configuration is valid run the command `terraform validate`
+4. Run `terraform plan` and make sure that you understand all the resources that will be created
+5. To create the resources run `terraform apply` and `yes` to create the infrastructure in AWS. This will take some time to create all the resources, wait for about 5 to 10 minuits then you can verify that all the resources have been created. 
+When you are satisfied , don't forget to clean up by running the `terraform destroy` command to destroy all the resources.
 
 ## ERRORS and Troubleshooting
 
